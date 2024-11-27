@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        /* General styling */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative; /* Ensure each section is relative to control layering */
+            z-index: 1; /* Default z-index for all sections */
+        }
+
+        /* Section styles */
+        .leading-section, .middle-section, .ending-section {
+            height: 200vh;
+            background-color: #f0f0f0;
+            padding: 50px;
+            z-index: 2; /* Set a lower z-index than the videos to prevent overlap */
+        }
+
+        /* Video Section Styling */
+        .video-section {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 3; /* Higher z-index to ensure video container is above other sections */
+        }
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 4; /* Highest z-index to keep the video above all other elements */
+        }
+
+        /* Overlay Styling */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 5; /* Overlay slightly higher than the video container */
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Leading Section: Story introduction, 200vh tall -->
+        <section class="leading-section">
+            <h1>Leading Section</h1>
+            <p>Introduction or story content goes here. This section is 200vh tall.</p>
+        </section>
+
+        <!-- First Video Section: Plays as you scroll through this section -->
+        <section class="video-section" id="videoSection1">
+            <div class="video-container">
+                <video id="video1" src="https://web.cw.com.tw/climate-2020/landing/cover-mobile.mp4" muted></video>
+            </div>
+            <div class="overlay">
+                <h1>Video Section 1</h1>
+            </div>
+        </section>
+
+        <!-- Middle Section: Adds 200vh space before the next video -->
+        <section class="middle-section">
+            <h1>Middle Section</h1>
+            <p>This section provides a break between the two video sections, 200vh tall.</p>
+        </section>
+
+        <!-- Second Video Section: Starts when scrolled into view -->
+        <section class="video-section" id="videoSection2">
+            <div class="video-container">
+                <video id="video2" src="https://web.cw.com.tw/climate-2020/landing/cover-mobile.mp4" muted></video>
+            </div>
+            <div class="overlay">
+                <h1>Video Section 2</h1>
+            </div>
+        </section>
+
+        <!-- Ending Section: Conclusion of the story -->
+        <section class="ending-section">
+            <h1>Ending Section</h1>
+            <p>Final content goes here, concluding the story.</p>
+        </section>
+    </div>
+
+    <script>
+        $(function() {
+            // Sync video playback based on scroll position for a specific video section
+            function syncVideoPlayback(videoId, sectionId) {
+                const videoElement = $(videoId).get(0);
+                const sectionElement = $(sectionId);
+
+                if (!videoElement) {
+                    console.error("Video element not found:", videoId);
+                    return;
+                }
+
+                $(window).on('scroll', function() {
+                    const sectionTop = sectionElement.offset().top;
+                    const sectionHeight = sectionElement.height();
+                    const windowTop = $(window).scrollTop();
+                    const windowHeight = $(window).height();
+
+                    // Check if the section is in view
+                    if (windowTop >= sectionTop - windowHeight && windowTop < sectionTop + sectionHeight) {
+                        // Calculate playback time relative to scroll position in the section
+                        const maxScroll = sectionHeight + windowHeight;
+                        const currentScrollPosition = windowTop - sectionTop + windowHeight;
+                        videoElement.currentTime = videoElement.duration * (currentScrollPosition / maxScroll);
+                    } else {
+                        // Pause the video if the section is out of view
+                        videoElement.pause();
+                    }
+                });
+            }
+
+            // Initialize scroll-sync for each video section
+            syncVideoPlayback('#video1', '#videoSection1');
+            syncVideoPlayback('#video2', '#videoSection2');
+        });
+    </script>
+</body>
+</html>
